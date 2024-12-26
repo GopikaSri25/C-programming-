@@ -1,0 +1,53 @@
+/**
+ * Definition for a binary tree node.
+ * struct TreeNode {
+ *     int val;
+ *     struct TreeNode *left;
+ *     struct TreeNode *right;
+ * };
+ */
+/**
+ * Note: The returned array must be malloced, assume caller calls free().
+ */
+int f(struct TreeNode *root,int**array,int*index){
+    if(!root)
+        return 0;
+    int sum = f(root->left,array,index) + f(root->right,array,index)  + root->val;
+    (*array)[(*index)++] = sum;
+    return sum;
+}
+int cmp(const void *a , const void *b){
+    return *(int*)a - *(int*)b;
+}
+int* findFrequentTreeSum(struct TreeNode* root, int* returnSize) {
+    int*array = calloc(10001,sizeof(int));
+    int index = 0 ;
+    f(root,&array,&index);
+    array = realloc(array,sizeof(int)*index);
+    qsort(array,index,sizeof(int),cmp);
+    int count = 0;
+    int max = INT_MIN;
+    int e = array[0];
+    int*ret = malloc(sizeof(int)*index);
+    int i2 = 0;
+    for(int i = 0 ; i < index ; ){
+        while(i < index && array[i] == e){
+            count++;
+            i++;
+        }
+        if(max < count){
+            max = count;
+            i2 = 0;
+            ret[i2++] = e;
+        }
+        else if(count == max)
+            ret[i2++] = e;
+        if(i >= index )
+            break;
+        e = array[i];
+        count = 0;
+    }
+    ret = realloc(ret,sizeof(int)*i2);
+    *returnSize = i2;
+    return ret;
+}
